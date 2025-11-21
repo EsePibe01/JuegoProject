@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://fiwpln5ifoko"
+path="res://.godot/imported/Dragon Soul [8 bit cover] - Dragon Ball Z Kai OP 1 (ft. kenzonflo).mp3-264d73facad36dd0e831ad0abe6e9228.mp3str"
+
+[deps]
+
+source_file="res://Musica Piola/Dragon Soul [8 bit cover] - Dragon Ball Z Kai OP 1 (ft. kenzonflo).mp3"
+dest_files=["res://.godot/imported/Dragon Soul [8 bit cover] - Dragon Ball Z Kai OP 1 (ft. kenzonflo).mp3-264d73facad36dd0e831ad0abe6e9228.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

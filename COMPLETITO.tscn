@@ -1,0 +1,66 @@
+[gd_scene load_steps=9 format=3 uid="uid://c6t75ioccyrb8"]
+
+[ext_resource type="Texture2D" uid="uid://bu1ogvrttaoh3" path="res://Cosas Test/COMPLETO.png" id="1_ss4ah"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ss4ah"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ss4ah"]
+atlas = ExtResource("1_ss4ah")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5vry2"]
+atlas = ExtResource("1_ss4ah")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2pg77"]
+atlas = ExtResource("1_ss4ah")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3aah5"]
+atlas = ExtResource("1_ss4ah")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_jfpqu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ss4ah")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5vry2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2pg77")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3aah5")
+}],
+"loop": true,
+"name": &"movimientocompleto",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xj2c6"]
+size = Vector2(11.84623, 14.906352)
+
+[node name="Node2D" type="Node2D"]
+
+[node name="RigidBody2D" type="RigidBody2D" parent="."]
+mass = 0.01
+physics_material_override = SubResource("PhysicsMaterial_ss4ah")
+gravity_scale = 0.155
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="RigidBody2D"]
+position = Vector2(-3.7727337, -9.685591)
+scale = Vector2(4.346205, 4.215668)
+sprite_frames = SubResource("SpriteFrames_jfpqu")
+animation = &"movimientocompleto"
+autoplay = "movimientocompleto"
+frame = 3
+frame_progress = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D"]
+position = Vector2(-8, 0.49999952)
+rotation = 3.1415925
+scale = Vector2(5.0649033, -3.6897023)
+shape = SubResource("RectangleShape2D_xj2c6")

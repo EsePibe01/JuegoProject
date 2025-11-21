@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://dhooci6s5d8vc"]
+
+[ext_resource type="Texture2D" uid="uid://b1ettv7w73n6n" path="res://Helice1.png" id="1_djvkv"]
+[ext_resource type="Script" uid="uid://bd6gf85i5mywp" path="res://animatable_body_2d.gd" id="1_jtjp8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jtjp8"]
+size = Vector2(39.101746, 3.2172785)
+
+[node name="Plataforma1" type="Node2D"]
+
+[node name="AnimatableBody2D" type="AnimatableBody2D" parent="."]
+script = ExtResource("1_jtjp8")
+
+[node name="Sprite2D" type="Sprite2D" parent="AnimatableBody2D"]
+position = Vector2(54.000004, 44.75)
+scale = Vector2(4.3265123, 3.9952776)
+texture = ExtResource("1_djvkv")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatableBody2D"]
+position = Vector2(49.999996, 37.000004)
+scale = Vector2(3.3330202, 5.5766354)
+shape = SubResource("RectangleShape2D_jtjp8")

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://co6jn3kfge5p7"
+path="res://.godot/imported/Dragonball Super ED Usubeni 8BIT.mp3-8d0d88d96c43a23107cf6693624e2130.mp3str"
+
+[deps]
+
+source_file="res://Musica Piola/Dragonball Super ED Usubeni 8BIT.mp3"
+dest_files=["res://.godot/imported/Dragonball Super ED Usubeni 8BIT.mp3-8d0d88d96c43a23107cf6693624e2130.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

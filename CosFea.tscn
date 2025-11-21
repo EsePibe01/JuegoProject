@@ -1,0 +1,52 @@
+[gd_scene load_steps=8 format=3 uid="uid://knayhso0i5k2"]
+
+[ext_resource type="Texture2D" uid="uid://bhg6jkbdrut8v" path="res://1acf9f80504d4094e0fa4392291cbf1b.jpg" id="1_kbnet"]
+[ext_resource type="PackedScene" uid="uid://ddd3ked8hi5yt" path="res://MangoFrames.tscn" id="2_saosp"]
+[ext_resource type="Script" uid="uid://dgi2f4xb73l1v" path="res://audio_stream_player.gd" id="3_saosp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lqh3a"]
+size = Vector2(2181.96, 149.752)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_kbnet"]
+a = Vector2(-799.828, 450.058)
+b = Vector2(-794.297, -607.382)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kbnet"]
+size = Vector2(137.857, 109.017)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_saosp"]
+size = Vector2(170.005, 133.143)
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(366.781, 325)
+scale = Vector2(0.985976, 0.541875)
+texture = ExtResource("1_kbnet")
+
+[node name="CharacterBody2D" parent="." instance=ExtResource("2_saosp")]
+position = Vector2(-468, 370)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(576.438, 325.125)
+scale = Vector2(0.723203, 0.541875)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-288.215, 534.161)
+shape = SubResource("RectangleShape2D_lqh3a")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-577.207, 8.99654)
+shape = SubResource("SegmentShape2D_kbnet")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-975.227, 405.767)
+shape = SubResource("RectangleShape2D_kbnet")
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-891.744, 396.54)
+shape = SubResource("RectangleShape2D_saosp")
+
+[node name="MusicaFondo" type="AudioStreamPlayer" parent="."]
+volume_db = -23.432
+script = ExtResource("3_saosp")

@@ -1,0 +1,352 @@
+[gd_scene load_steps=36 format=3 uid="uid://ddd3ked8hi5yt"]
+
+[ext_resource type="Texture2D" uid="uid://cv735ri7s4ilo" path="res://MangoDescanso.png" id="2_6uc2p"]
+[ext_resource type="Texture2D" uid="uid://bcjrgw28bnvpe" path="res://Caida1.png" id="2_cgc4o"]
+[ext_resource type="Texture2D" uid="uid://13dva08hbtwq" path="res://Mango1Caminando.png" id="3_xig8c"]
+[ext_resource type="Texture2D" uid="uid://dgxajlhr77mgk" path="res://Salto1.png" id="4_6uc2p"]
+[ext_resource type="Texture2D" uid="uid://b4d5s54wru1d1" path="res://CaminandoPegando.png" id="4_76103"]
+[ext_resource type="Texture2D" uid="uid://i8y54ujcd8re" path="res://MangoPeleaNormal.png" id="5_6uc2p"]
+[ext_resource type="Texture2D" uid="uid://c6ohhxgvv2ort" path="res://MangoPeleaSaltol.png" id="6_xig8c"]
+
+[sub_resource type="GDScript" id="GDScript_ygjsw"]
+resource_name = "ScriptMango"
+script/source = "extends CharacterBody2D
+
+const SPEED = 300.0
+const JUMP_VELOCITY = -400.0
+const GRAVITY = 980.0
+const FRICTION = 1500.0
+const JUMP_HIGH = 0.25
+const ATTACK_COOLDOWN = 0.5
+
+var sprite: AnimatedSprite2D
+
+var jump_timer: float = 0.0
+var is_jumping: bool = false
+var walk_timer: float = 0.0
+
+var attacking: bool = false
+var can_attack: bool = true
+var attack_timer: float = 0.0
+
+func _ready():
+	sprite = $Node2D/AnimatedSprite2D
+	sprite.animation = \"AlDescanso\"
+	sprite.play()
+
+func _physics_process(delta: float) -> void:
+	# --- Cooldown de ataque ---
+	if not can_attack:
+		attack_timer += delta
+		if attack_timer >= ATTACK_COOLDOWN:
+			can_attack = true
+
+	# --- Movimiento ---
+	var direction := Input.get_axis(\"ui_left\", \"ui_right\")
+	if direction != 0:
+		velocity.x = direction * SPEED
+		sprite.flip_h = direction < 0
+		walk_timer = 0.1
+	else:
+		velocity.x = move_toward(velocity.x, 0, FRICTION * delta)
+		if walk_timer > 0:
+			walk_timer -= delta
+
+	# --- Salto ---
+	if Input.is_action_just_pressed(\"ui_accept\") and is_on_floor():
+		jump_timer = 0.0
+		is_jumping = true
+
+	if Input.is_action_pressed(\"ui_accept\") and is_jumping:
+		jump_timer += delta
+		if jump_timer <= JUMP_HIGH:
+			velocity.y = JUMP_VELOCITY
+		else:
+			is_jumping = false
+	else:
+		is_jumping = false
+
+	if not is_on_floor():
+		velocity.y += GRAVITY * delta
+
+	var on_floor = is_on_floor()
+
+	# --- Ataque dinámico ---
+	if can_attack and Input.is_action_pressed(\"Pelear\"):
+		attacking = true
+		can_attack = false
+		attack_timer = 0.0
+
+		if not on_floor:
+			sprite.animation = \"Salto\"  # reutilizamos Salto si no hay animación de ataque en aire
+		elif direction != 0:
+			sprite.animation = \"CaminarPegar\"
+		else:
+			sprite.animation = \"CaminarPegar\"
+		sprite.play()
+	else:
+		attacking = false
+
+	# --- Animaciones normales ---
+	if not attacking:
+		if not on_floor:
+			sprite.animation = velocity.y < 0 ? \"Salto\" : \"Caida\"
+			sprite.play()
+		else:
+			if direction != 0:
+				sprite.animation = \"Caminar\"
+				sprite.speed_scale = 1.5 + abs(velocity.x)/SPEED
+			else:
+				sprite.animation = \"AlDescanso\"
+				sprite.speed_scale = 1.0
+			sprite.play()
+
+	move_and_slide()
+
+"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ow6lq"]
+atlas = ExtResource("2_6uc2p")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pp43k"]
+atlas = ExtResource("2_6uc2p")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nsomt"]
+atlas = ExtResource("2_6uc2p")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6mhjg"]
+atlas = ExtResource("2_6uc2p")
+region = Rect2(0, 96, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xig8c"]
+atlas = ExtResource("2_cgc4o")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6uc2p"]
+atlas = ExtResource("2_6uc2p")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r5quc"]
+atlas = ExtResource("3_xig8c")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gcy0b"]
+atlas = ExtResource("3_xig8c")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_urtll"]
+atlas = ExtResource("3_xig8c")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w0aot"]
+atlas = ExtResource("3_xig8c")
+region = Rect2(0, 96, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lbovd"]
+atlas = ExtResource("4_76103")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_axio3"]
+atlas = ExtResource("4_76103")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qlvfm"]
+atlas = ExtResource("4_76103")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1rg42"]
+atlas = ExtResource("4_76103")
+region = Rect2(0, 96, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rggoe"]
+atlas = ExtResource("4_6uc2p")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bdie8"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ow6lq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pp43k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nsomt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6mhjg")
+}],
+"loop": true,
+"name": &"AlDescanso",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xig8c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6uc2p")
+}],
+"loop": true,
+"name": &"Caida",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r5quc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gcy0b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_urtll")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w0aot")
+}],
+"loop": true,
+"name": &"Caminar",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lbovd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_axio3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qlvfm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1rg42")
+}],
+"loop": true,
+"name": &"CaminarPegar",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rggoe")
+}],
+"loop": true,
+"name": &"Salto",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_76103"]
+atlas = ExtResource("5_6uc2p")
+region = Rect2(0, 3, 30, 27)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7egdr"]
+atlas = ExtResource("5_6uc2p")
+region = Rect2(0, 35, 30, 27)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8lbim"]
+atlas = ExtResource("5_6uc2p")
+region = Rect2(0, 67, 30, 27)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0f7fv"]
+atlas = ExtResource("5_6uc2p")
+region = Rect2(0, 99, 30, 27)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_brecj"]
+atlas = ExtResource("6_xig8c")
+region = Rect2(0, 3, 30, 27)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bdie8"]
+atlas = ExtResource("6_xig8c")
+region = Rect2(0, 35, 30, 27)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fa846"]
+atlas = ExtResource("6_xig8c")
+region = Rect2(0, 67, 30, 27)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_brecj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_76103")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7egdr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8lbim")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0f7fv")
+}],
+"loop": false,
+"name": &"PeleaNormal",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_brecj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bdie8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fa846")
+}],
+"loop": false,
+"name": &"SaltoPelea",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cgc4o"]
+size = Vector2(78.4, 108.869)
+
+[sub_resource type="GDScript" id="GDScript_cgc4o"]
+
+[sub_resource type="GDScript" id="GDScript_6uc2p"]
+script/source = "extends Camera2D
+
+@export var follow_speed: float = 5.0
+var target: Node2D = null
+
+func _ready():
+	# Suponiendo que tu personaje se llama \"CharacterBody2D\" en la escena
+	target = get_parent().get_node(\"CharacterBody2D\")
+	make_current()  # Esto activa la cámara
+
+func _process(delta):
+	if target:
+		# Movimiento suave
+		global_position = lerp(global_position, target.global_position, follow_speed * delta)
+"
+
+[node name="CharacterBody2D" type="CharacterBody2D"]
+script = SubResource("GDScript_ygjsw")
+
+[node name="Node2D" type="Node2D" parent="."]
+position = Vector2(0, -1.52588e-05)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Node2D"]
+position = Vector2(115, 163.75)
+scale = Vector2(2.9375, 2.60937)
+sprite_frames = SubResource("SpriteFrames_bdie8")
+animation = &"CaminarPegar"
+
+[node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="Node2D"]
+visible = false
+position = Vector2(100, 165)
+scale = Vector2(2.888, 2.609)
+sprite_frames = SubResource("SpriteFrames_brecj")
+animation = &"PeleaNormal"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(113.5, 167.5)
+scale = Vector2(0.625, 0.597046)
+shape = SubResource("RectangleShape2D_cgc4o")
+script = SubResource("GDScript_cgc4o")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(17, 150)
+script = SubResource("GDScript_6uc2p")

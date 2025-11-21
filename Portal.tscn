@@ -1,0 +1,72 @@
+[gd_scene load_steps=11 format=3 uid="uid://c3onkvgr46ql"]
+
+[ext_resource type="Texture2D" uid="uid://c37bsnejajgxt" path="res://Cosas Test/Dimensional_Portal.png" id="1_4hdyq"]
+[ext_resource type="Script" uid="uid://dem7ar6flh5od" path="res://portal.gd" id="1_bagdj"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4hdyq"]
+atlas = ExtResource("1_4hdyq")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bagdj"]
+atlas = ExtResource("1_4hdyq")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_aamt4"]
+atlas = ExtResource("1_4hdyq")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8ti6q"]
+atlas = ExtResource("1_4hdyq")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lf6e3"]
+atlas = ExtResource("1_4hdyq")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1cnrw"]
+atlas = ExtResource("1_4hdyq")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_i63wp"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4hdyq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bagdj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_aamt4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8ti6q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lf6e3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1cnrw")
+}],
+"loop": true,
+"name": &"portal",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_t5hry"]
+radius = 6.0
+
+[node name="PORTAL" type="Area2D"]
+script = ExtResource("1_bagdj")
+float_height = null
+float_speed = null
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(110, 95)
+sprite_frames = SubResource("SpriteFrames_i63wp")
+animation = &"portal"
+frame_progress = 0.54438776
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(111, 95)
+shape = SubResource("CapsuleShape2D_t5hry")

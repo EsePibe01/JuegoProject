@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ck1kuh25deaw"
+path="res://.godot/imported/Jujutsu Kaisen Season 2 Opening  - Ao no Sumika [8 bit Cover].mp3-3c2d34dbc032a0f18a16f0c251730ab3.mp3str"
+
+[deps]
+
+source_file="res://Musica Piola/Jujutsu Kaisen Season 2 Opening  - Ao no Sumika [8 bit Cover].mp3"
+dest_files=["res://.godot/imported/Jujutsu Kaisen Season 2 Opening  - Ao no Sumika [8 bit Cover].mp3-3c2d34dbc032a0f18a16f0c251730ab3.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
