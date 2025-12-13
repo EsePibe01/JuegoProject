@@ -1,0 +1,80 @@
+[gd_scene load_steps=6 format=3 uid="uid://dmkb7pt7n0uid"]
+
+[ext_resource type="Script" uid="uid://cn2fiqsmmoswl" path="res://menu_inicio.gd" id="1_cxoyd"]
+[ext_resource type="Texture2D" uid="uid://ctmek8l2a2gi0" path="res://Free/Background/Brown.png" id="2_kt2nm"]
+[ext_resource type="FontFile" uid="uid://ba82nsmn27h4l" path="res://minecraft/Minecraft/Minecraft-Bold.otf" id="3_w0mag"]
+[ext_resource type="FontFile" uid="uid://berklgtqvf33d" path="res://minecraft/Minecraft/Minecraft-BoldItalic.otf" id="4_gtu58"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ht1qv"]
+texture = ExtResource("2_kt2nm")
+
+[node name="MenuInicio" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_cxoyd")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_ht1qv")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -529.0
+offset_top = 124.0
+offset_right = 611.0
+offset_bottom = 209.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.7456574, 0.41321376, 0, 1)
+theme_override_fonts/font = ExtResource("3_w0mag")
+theme_override_font_sizes/font_size = 80
+text = "MANGO GATO ADVENTURE"
+
+[node name="Jugar" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("4_gtu58")
+theme_override_font_sizes/font_size = 46
+text = "PUCHELE PLAY!"
+
+[node name="Salir" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -187.0
+offset_top = -260.0
+offset_right = 185.0
+offset_bottom = -172.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("4_gtu58")
+theme_override_font_sizes/font_size = 40
+text = "¿QUIERE SALIR?
+SALGASE PUES"
+
+[connection signal="pressed" from="Jugar" to="." method="_on_jugar_pressed"]
+[connection signal="pressed" from="Salir" to="." method="_on_salir_pressed"]

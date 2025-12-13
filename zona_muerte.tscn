@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://dyxreo3dmn52r"]
+
+[ext_resource type="Script" uid="uid://ivnm2f8jsmn1" path="res://zona_muerte.gd" id="1_8hpt8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gdfn1"]
+size = Vector2(139, 46)
+
+[node name="ZonaMuerte" type="Area2D"]
+collision_layer = 0
+script = ExtResource("1_8hpt8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(69.5, 22)
+shape = SubResource("RectangleShape2D_gdfn1")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
