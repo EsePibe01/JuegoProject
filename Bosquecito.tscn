@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=4 uid="uid://c53koelcobip8"]
+[gd_scene load_steps=13 format=4 uid="uid://c53koelcobip8"]
 
 [ext_resource type="Texture2D" uid="uid://crcdrlingfqdy" path="res://Bosque/FreeCuteTileset/Tileset.png" id="1_2xoa4"]
 [ext_resource type="PackedScene" uid="uid://cxmowwcfot0mf" path="res://MangoFrames.tscn" id="1_s4xcm"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://b33owh5i5jog8" path="res://Bosque/FreeCuteTileset/BG3.png" id="3_2xoa4"]
 [ext_resource type="Texture2D" uid="uid://daxxg38pm0ris" path="res://Montaña Glacial/Glacial-mountains-parallax-background_vnitti/Layers/sky_lightened.png" id="5_62aun"]
 [ext_resource type="PackedScene" uid="uid://dyxreo3dmn52r" path="res://zona_muerte.tscn" id="8_yuwwu"]
+[ext_resource type="PackedScene" uid="uid://c8yra5uls4mkb" path="res://hongo.tscn" id="9_7ajlo"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_62aun"]
 texture = ExtResource("1_2xoa4")
@@ -293,3 +294,6 @@ texture = ExtResource("3_2xoa4")
 [node name="ZonaMuerte" parent="." instance=ExtResource("8_yuwwu")]
 position = Vector2(5, 741)
 scale = Vector2(35.612022, 1.5695944)
+
+[node name="CharacterBody2D2" parent="." instance=ExtResource("9_7ajlo")]
+position = Vector2(185, 462)
