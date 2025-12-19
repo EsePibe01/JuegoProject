@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://b5k3aa4p77fgh"]
+
+[ext_resource type="Script" uid="uid://c3fm5h5aal0lt" path="res://floating_damage.gd" id="1_4a7pe"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_3vn20"]
+outline_color = Color(0.022507928, 2.135802e-05, 0.060507983, 1)
+
+[node name="FloatingDamage" type="Marker2D"]
+script = ExtResource("1_4a7pe")
+
+[node name="Label" type="Label" parent="."]
+custom_minimum_size = Vector2(-50, 100)
+offset_right = 40.0
+offset_bottom = 23.0
+label_settings = SubResource("LabelSettings_3vn20")
+horizontal_alignment = 1

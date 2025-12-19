@@ -1,130 +1,135 @@
 extends CharacterBody2D 
-# 🛑 El nodo raíz del Hongo debe ser un CharacterBody2D.
 
-# =========================================================
-# I. CONSTANTES Y VARIABLES DE ESTADO (SIN ERRORES DE SINTAXIS)
-# =========================================================
+# Ruta a tu escena de número de daño
+const DAMAGE_POPUP_SCENE = preload("res://floating_damage.tscn")
 
 # --- Nodos ---
 @onready var anim_sprite: AnimatedSprite2D = $Node2D/AnimatedSprite2D 
+@onready var barra_vida: ProgressBar = $BarraVida 
+@onready var raycast_ataque: RayCast2D = $RayCastAtaque
 
-# --- Estado de Salud ---
+# --- Variables ---
 var vida_actual: int = 3
 const MAX_VIDA: int = 3
-
-# --- Daño, Muerte y Tiempos ---
 var is_dead := false
 var is_receiving_damage := false
-# Tiempo ajustado a 1.5s para asegurar que la animación de muerte se vea completa
-const TIEMPO_ANIMACION_MUERTE := 1.5 
-const TIEMPO_ANIMACION_HIT := 0.25
+var is_attacking := false 
+var is_stunned := false 
 
-# --- Movimiento y Patrullaje ---
+# --- Configuración ---
+const DAÑO_ATAQUE := 1
+const CHANCE_DE_STUN := 0.5 
+const TIEMPO_STUN := 2.0 
 const SPEED: float = 50.0 
 const GRAVITY: float = 1200.0 
-var direction: int = 1 # 1 = derecha, -1 = izquierda
-
-# Variables de Patrullaje sin nodo Timer:
-const PATROL_DURATION: float = 3.0 # El hongo cambia de dirección cada 3.0 segundos
-var patrol_time_counter: float = 0.0 # Contador para rastrear el tiempo de patrullaje
-
-# =========================================================
-# II. FUNCIÓN DE INICIO
-# =========================================================
+var direction: int = 1 
+const PATROL_DURATION: float = 3.0 
+var patrol_time_counter: float = 0.0 
 
 func _ready():
-	is_dead = false
-	is_receiving_damage = false
-	set_physics_process(true) 
-	anim_sprite.play("idle") # Inicia con animación "idle"
-	patrol_time_counter = 0.0
-
-# =========================================================
-# III. PROCESO FÍSICO (Movimiento, Espejo y Patrullaje)
-# =========================================================
+	is_dead = false; is_receiving_damage = false; is_attacking = false; is_stunned = false
+	set_physics_process(true); anim_sprite.play("idle"); patrol_time_counter = 0.0
+	
+	if barra_vida: 
+		barra_vida.max_value = MAX_VIDA; barra_vida.value = vida_actual; barra_vida.visible = true 
+	
+	# Evitar que el rayo choque con el propio hongo
+	if raycast_ataque: 
+		raycast_ataque.add_exception(self)
+		raycast_ataque.enabled = true
 
 func _physics_process(delta: float) -> void:
-	if is_dead:
-		return
+	if is_dead: return 
+	if not is_on_floor(): velocity.y += GRAVITY * delta
+	else: velocity.y = 0
 	
-	# === LÓGICA DE PATRULLAJE BASADA EN TIEMPO ===
+	# Si está ocupado (atacando/stun/herido), no se mueve
+	if is_attacking or is_stunned or is_receiving_damage: 
+		velocity.x = 0; move_and_slide(); return 
+
+	# Detectar jugador
+	if raycast_ataque.is_colliding():
+		var collider = raycast_ataque.get_collider()
+		if collider.has_method("recibir_danio"): 
+			start_attack(collider)
+			return 
+
+	# Patrullaje
 	patrol_time_counter += delta
-	
-	if patrol_time_counter >= PATROL_DURATION:
-		direction *= -1 # Invierte la dirección (el "recorrido leve")
-		patrol_time_counter = 0.0 # Reinicia el contador
+	if patrol_time_counter >= PATROL_DURATION: change_direction()
 
-	# 1. Aplicar Gravedad
-	if not is_on_floor():
-		velocity.y += GRAVITY * delta
-	else:
-		velocity.y = 0
-
-	# 2. Movimiento Horizontal
 	velocity.x = direction * SPEED
-	
-	# 3. Orientar el Sprite (CORRECCIÓN DEL EFECTO ESPEJO)
-	# Se voltea el sprite (flip_h = true) cuando la dirección es a la derecha (1)
 	anim_sprite.flip_h = (direction == 1) 
-	
-	# 4. Mover y Deslizar
 	move_and_slide()
 	
-	# 5. Animación
-	if not is_receiving_damage:
-		if is_on_floor():
-			if velocity.x != 0:
-				anim_sprite.play("walk") # Movimiento horizontal
-			else:
-				anim_sprite.play("idle") # Quieto
+	if is_on_floor():
+		if velocity.x != 0: anim_sprite.play("walk")
+		else: anim_sprite.play("idle")
 
+func change_direction():
+	direction *= -1; patrol_time_counter = 0.0
+	# Voltear el raycast es clave para que ataque al lado correcto
+	raycast_ataque.target_position.x *= -1
 
-# =========================================================
-# IV. FUNCIONES DE COMBATE Y ESTADO (die() GARANTIZA TIEMPO)
-# =========================================================
+func start_attack(_target) -> void:
+	if is_attacking or is_stunned: return
+	is_attacking = true
+	anim_sprite.play("attack")
+	
+	# Esperar a que termine la animación del golpe
+	await anim_sprite.animation_finished
+	
+	# Verificar si sigue colisionando para hacer daño
+	if raycast_ataque.is_colliding():
+		var cuerpo = raycast_ataque.get_collider()
+		if cuerpo.has_method("recibir_danio"): 
+			cuerpo.recibir_danio(DAÑO_ATAQUE)
+	
+	# Calcular si se marea (50%)
+	if randf() < CHANCE_DE_STUN: 
+		enter_stun_state()
+	else: 
+		is_attacking = false; anim_sprite.play("idle")
 
-# --- Función para recibir daño (Llamada por el ataque del jugador) ---
+func enter_stun_state() -> void:
+	print("El hongo se mareó!")
+	is_stunned = true; is_attacking = false
+	anim_sprite.play("attack_stun")
+	await get_tree().create_timer(TIEMPO_STUN).timeout
+	if not is_dead: is_stunned = false; anim_sprite.play("idle")
+
 func recibir_danio(cantidad_danio: int) -> void:
-	if is_dead or is_receiving_damage:
-		return
-
+	if is_dead: return
+	spawn_damage_number(cantidad_danio)
 	vida_actual -= cantidad_danio
-	print("Hongo recibió ", cantidad_danio, " de daño. Vida restante: ", vida_actual)
+	if barra_vida: barra_vida.value = vida_actual
+	
+	# Interrumpir ataque si le pegan
+	is_attacking = false; is_stunned = false
+	
+	if vida_actual <= 0: die()
+	else: if not is_receiving_damage: hit_received()
 
-	if vida_actual <= 0:
-		die()
-	else:
-		hit_received()
-
-# --- Reacción al Golpe ('hit') ---
 func hit_received() -> void:
-	is_receiving_damage = true
-	patrol_time_counter = 0.0 
-	
-	# 1. Reproducir animación 'hit'
-	anim_sprite.play("hit")
-	
-	# 2. Esperar la duración del golpe
-	await get_tree().create_timer(TIEMPO_ANIMACION_HIT).timeout
-	
-	# 3. Regresar a 'walk'
+	is_receiving_damage = true; patrol_time_counter = 0.0; anim_sprite.play("hit")
+	await get_tree().create_timer(0.25).timeout
+	if is_dead: return
 	is_receiving_damage = false
-	anim_sprite.play("walk") 
 
-
-# --- Función de Muerte ('die') ---
 func die() -> void:
-	if is_dead:
-		return
-
-	is_dead = true
-	set_physics_process(false) 
+	if is_dead: return
 	
-	# 1. Reproducir animación 'die'
+	# 🔥 Curar al jugador (Grupo 'player') al morir 🔥
+	get_tree().call_group("player", "curar_vida", 1)
+	
+	is_dead = true; set_physics_process(false); velocity = Vector2.ZERO
+	if barra_vida: barra_vida.visible = false 
 	anim_sprite.play("die")
-
-	# 2. Esperar el tiempo de la animación antes de desaparecer
-	await get_tree().create_timer(TIEMPO_ANIMACION_MUERTE).timeout
-	
-	# 3. Eliminar el hongo
+	await get_tree().create_timer(1.5).timeout
 	queue_free()
+
+func spawn_damage_number(valor: int) -> void:
+	var popup = DAMAGE_POPUP_SCENE.instantiate()
+	popup.setup(valor)
+	popup.global_position = global_position + Vector2(0, -30)
+	get_tree().current_scene.add_child(popup)

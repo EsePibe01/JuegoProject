@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=4 uid="uid://v4ewpadek5oe"]
+[gd_scene load_steps=39 format=4 uid="uid://v4ewpadek5oe"]
 
 [ext_resource type="Texture2D" uid="uid://21vj6s6fb8fa" path="res://Montaña Glacial/Glacial-mountains-parallax-background_vnitti/Layers/sky.png" id="1_8gmw0"]
 [ext_resource type="Script" uid="uid://dgi2f4xb73l1v" path="res://audio_stream_player.gd" id="1_vpwrl"]
@@ -21,6 +21,7 @@
 [ext_resource type="PackedScene" uid="uid://dhooci6s5d8vc" path="res://movilidad.tscn" id="17_cqjff"]
 [ext_resource type="PackedScene" uid="uid://dyxreo3dmn52r" path="res://zona_muerte.tscn" id="21_mo2cd"]
 [ext_resource type="PackedScene" uid="uid://c3onkvgr46ql" path="res://Portal.tscn" id="21_n7mki"]
+[ext_resource type="PackedScene" uid="uid://bhtvtab6it8vm" path="res://gatomafiajefe.tscn" id="22_mo2cd"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_a2w46"]
 texture = ExtResource("4_lerv6")
@@ -2032,7 +2033,7 @@ a = Vector2(-4, 0)
 b = Vector2(-1, 593)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1bci8"]
-size = Vector2(631.25, 576)
+size = Vector2(585.625, 576)
 
 [node name="Node2D" type="Node2D"]
 
@@ -2132,16 +2133,20 @@ texture = ExtResource("6_lerv6")
 shape = SubResource("SegmentShape2D_vpwrl")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(13618, 287)
+position = Vector2(13640.8125, 287)
 shape = SubResource("RectangleShape2D_1bci8")
 
 [node name="Node2D2" parent="." instance=ExtResource("17_cqjff")]
 position = Vector2(4540, 530)
 
 [node name="PORTAL" parent="." instance=ExtResource("21_n7mki")]
-position = Vector2(12972, -80)
+position = Vector2(12992, 112)
 scale = Vector2(2.7782075, 2.3058674)
 
 [node name="ZonaMuerte2" parent="." instance=ExtResource("21_mo2cd")]
 position = Vector2(-111.00001, 783)
 scale = Vector2(99.9438, 3.9685667)
+
+[node name="CharacterBody2D2" parent="." instance=ExtResource("22_mo2cd")]
+position = Vector2(702, 368)
+scale = Vector2(0.9970567, 0.9973911)
