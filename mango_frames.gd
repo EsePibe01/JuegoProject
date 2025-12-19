@@ -16,7 +16,7 @@ const JUMP_HOLD_FORCE := -520.0
 const MAX_JUMP_HOLD_TIME := 0.35
 const GRAVITY := 980.0
 
-# --- CONSTANTES DE VIDA (5 VIDAS) ---
+# --- CONSTANTES DE VIDA ---
 const DEATH_JUMP_FORCE := -500.0 
 const MAX_HEALTH := 5 
 var current_health := 5
@@ -40,12 +40,11 @@ const DAMAGE_BLACK_FLASH := 10
 @onready var camera: Camera2D = $Camera2D2
 @onready var sonido_black_flash: AudioStreamPlayer2D = $SonidoBlackFlash 
 @onready var health_bar: ProgressBar = $CanvasLayer/HealthBar
-
-# 🔥 Referencia a la etiqueta del Dash (¡Crea este nodo en tu escena!) 🔥
 @onready var dash_label: Label = $DashLabel
 
 # --- Variables Visuales ---
 var black_flash_rect: ColorRect
+var black_flash_label: Label  # La etiqueta del texto
 var lightning_gradient: Gradient
 var heal_gradient: Gradient 
 
@@ -58,7 +57,7 @@ var shadow_timer := 0.0
 var dash_cooldown_timer := 0.0
 var has_air_dashed := false
 var is_attacking := false 
-var attack_timer := 0.0     
+var attack_timer := 0.0      
 var walk_timer := 0.0
 var idle_time := 0.0
 var is_afk := false
@@ -69,12 +68,13 @@ var is_current_attack_epic := false
 var epic_hit_timer := 0.0 
 var shake_strength: float = 0.0 
 const SHAKE_DECAY_RATE: float = 5.0 
+
 var current_damage: int = 1
 
-# --- 🔥 CONFIGURACIÓN DEL DASH (AJUSTADO) 🔥 ---
-const DASH_DISTANCE := 250.0 # Distancia media (antes 600 era muy largo)
-const DASH_TIME := 0.2       # Rápido
-const DASH_COOLDOWN := 3.0   # 3 segundos de espera
+# --- CONFIGURACIÓN DEL DASH ---
+const DASH_DISTANCE := 250.0
+const DASH_TIME := 0.2        
+const DASH_COOLDOWN := 3.0    
 const SHADOW_LIFETIME := 0.3
 const SHADOW_INTERVAL := 0.05
 const WALK_ANIM_HOLD := 0.1
@@ -90,8 +90,8 @@ func _ready():
 	is_dead = false 
 	is_taking_damage = false
 	current_health = MAX_HEALTH 
-	velocity = Vector2.ZERO         
-	set_physics_process(true)       
+	velocity = Vector2.ZERO          
+	set_physics_process(true)        
 	
 	anim_sprite.show() 
 	anim_sprite.play("Descansando") 
@@ -104,7 +104,6 @@ func _ready():
 		health_bar.max_value = MAX_HEALTH
 		health_bar.value = current_health
 
-	# Ocultar la etiqueta del dash al iniciar
 	if dash_label:
 		dash_label.text = "" 
 		dash_label.modulate.a = 0.0 
@@ -131,34 +130,29 @@ func _physics_process(delta: float) -> void:
 
 	if epic_hit_timer > 0: epic_hit_timer -= delta
 
-	# --- 🔥 LOGICA VISUAL DEL DASH 🔥 ---
-	# Si hay cooldown, restamos tiempo y mostramos el número
+	# --- UI DASH ---
 	if dash_cooldown_timer > 0:
 		dash_cooldown_timer -= delta
-		
 		if dash_label:
-			# Mostramos el tiempo con 1 decimal (ej: "2.1")
 			dash_label.text = "%.1f" % dash_cooldown_timer
-			dash_label.modulate = Color(1, 1, 0, 1) # Amarillo
-			dash_label.modulate.a = 1.0 # Aseguramos que sea visible
-
-		# Si el cooldown termina JUSTO AHORA
+			dash_label.modulate = Color(1, 1, 0, 1)
+			dash_label.modulate.a = 1.0
 		if dash_cooldown_timer <= 0:
 			dash_cooldown_timer = 0
 			if dash_label:
 				dash_label.text = "Dash Listo"
-				dash_label.modulate = Color(0, 1, 0, 1) # Verde
-				# Animación para que desaparezca suavemente
+				dash_label.modulate = Color(0, 1, 0, 1)
 				var t = create_tween()
 				t.tween_property(dash_label, "modulate:a", 0.0, 1.0).set_delay(0.5)
-	# ------------------------------------
 
+	# --- DAÑO ---
 	if is_taking_damage:
 		velocity.x = 0 
 		if not is_on_floor(): velocity.y += GRAVITY * delta
 		move_and_slide()
 		return
 
+	# --- ATAQUE ---
 	if is_attacking:
 		attack_timer -= delta
 		if not is_current_attack_crit and is_current_attack_epic:
@@ -169,6 +163,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_key_pressed(KEY_P) and not is_dashing and not is_attacking:
 		start_attack()
 
+	# --- MOVIMIENTO ---
 	var input_dir := 0
 	if Input.is_key_pressed(KEY_A): input_dir -= 1
 	if Input.is_key_pressed(KEY_D): input_dir += 1
@@ -178,12 +173,20 @@ func _physics_process(delta: float) -> void:
 		walk_timer = WALK_ANIM_HOLD
 		is_afk = false; idle_time = 0.0
 
+	# --- CORRECCIÓN HITBOX (POSICIÓN) ---
+	var distancia_hitbox = abs(attack_hitbox.position.x)
+	if anim_sprite.flip_h:
+		attack_hitbox.position.x = -distancia_hitbox
+	else:
+		attack_hitbox.position.x = distancia_hitbox
+
 	if not is_dashing:
 		var target_speed = input_dir * SPEED
 		if is_attacking: target_speed *= ATTACK_MOVEMENT_SPEED
 		velocity.x = target_speed
 		if not is_on_floor(): velocity.y += GRAVITY * delta
 	
+	# --- SALTO ---
 	if Input.is_key_pressed(KEY_W) and is_on_floor() and not is_dashing:
 		velocity.y = JUMP_VELOCITY; sonido_salto.play(); is_jumping = true; jump_hold_time = 0.0; has_air_dashed = false; idle_time = 0.0
 	if is_jumping:
@@ -191,7 +194,7 @@ func _physics_process(delta: float) -> void:
 		else: is_jumping = false
 	if not Input.is_key_pressed(KEY_W) and velocity.y < 0: is_jumping = false; velocity.y *= 0.5
 
-	# Input de Dash
+	# --- DASH ---
 	if Input.is_key_pressed(KEY_J) and not is_dashing and dash_cooldown_timer <= 0 and not has_air_dashed and not is_on_floor():
 		start_dash(input_dir)
 		
@@ -207,6 +210,7 @@ func _physics_process(delta: float) -> void:
 		if collision.get_collider() is RigidBody2D:
 			collision.get_collider().apply_central_impulse(-collision.get_normal() * velocity.length() * PUSH_FORCE_MULTIPLIER * delta)
 
+	# --- ANIMACIONES ---
 	if is_attacking: _play_anim("OraOra") 
 	elif is_dashing: pass 
 	elif not is_on_floor(): _play_anim("Salto")
@@ -225,12 +229,9 @@ func start_dash(input_dir: int) -> void:
 	is_dashing = true
 	dash_timer = DASH_TIME
 	shadow_timer = 0.0
-	
-	# Iniciamos Cooldown
 	dash_cooldown_timer = DASH_COOLDOWN 
 	has_air_dashed = true
 	
-	# Hacemos visible el contador inmediatamente
 	if dash_label:
 		dash_label.modulate.a = 1.0 
 		dash_label.text = "3.0"
@@ -244,8 +245,6 @@ func stop_dash() -> void:
 	is_dashing = false
 	velocity.x = 0
 
-# ... (Resto de funciones: start_attack, recibir_danio, curar, etc. siguen igual) ...
-
 func start_attack() -> void:
 	is_attacking = true; attack_timer = ATTACK_DURATION; shadow_timer = 0.0; is_current_attack_crit = randf() < CRIT_CHANCE
 	if not is_current_attack_crit:
@@ -254,12 +253,15 @@ func start_attack() -> void:
 	else: is_current_attack_epic = false 
 	if is_current_attack_crit: print("¡BLACK FLASH!"); trigger_black_flash_effect(); current_damage = DAMAGE_BLACK_FLASH 
 	else: if is_current_attack_epic: apply_shake(5.0); current_damage = DAMAGE_NORMAL 
-	if is_instance_valid(attack_hitbox) and attack_hitbox.get_child_count() > 0: attack_hitbox.get_child(0).disabled = false 
+	
+	if is_instance_valid(attack_hitbox) and attack_hitbox.get_child_count() > 0: 
+		attack_hitbox.get_child(0).disabled = false 
 	_play_anim("OraOra") 
 
 func stop_attack() -> void:
 	is_attacking = false; is_current_attack_crit = false; is_current_attack_epic = false
-	if is_instance_valid(attack_hitbox) and attack_hitbox.get_child_count() > 0: attack_hitbox.get_child(0).disabled = true
+	if is_instance_valid(attack_hitbox) and attack_hitbox.get_child_count() > 0: 
+		attack_hitbox.get_child(0).disabled = true
 
 func apply_shake(strength: float) -> void: shake_strength = strength
 
@@ -296,7 +298,34 @@ func _spawn_heal_particles() -> void:
 	var particles = CPUParticles2D.new(); particles.emitting = false; particles.one_shot = true; particles.amount = 15; particles.lifetime = 1.0; particles.explosiveness = 0.8; particles.direction = Vector2(0, -1); particles.spread = 45.0; particles.gravity = Vector2(0, -50); particles.initial_velocity_min = 50; particles.initial_velocity_max = 100; particles.scale_amount_min = 3.0; particles.scale_amount_max = 5.0; particles.color_ramp = heal_gradient; particles.z_index = 20; add_child(particles); particles.emitting = true; await get_tree().create_timer(1.2).timeout; particles.queue_free()
 
 func trigger_black_flash_effect() -> void:
-	var offset_x = 45 if not anim_sprite.flip_h else -45; var impact_pos_global = anim_sprite.global_position + Vector2(offset_x, 0); if sonido_black_flash: sonido_black_flash.play(); _create_impact_particles(impact_pos_global); spawn_black_flash_lightning(impact_pos_global); if black_flash_rect: black_flash_rect.visible = true; await get_tree().create_timer(0.02, true, false, true).timeout; apply_shake(25.0); var previous_time_scale = Engine.time_scale; Engine.time_scale = 0.01; await get_tree().create_timer(HITSTOP_DURATION, true, false, true).timeout; Engine.time_scale = previous_time_scale; if black_flash_rect: black_flash_rect.visible = false; await get_tree().create_timer(0.2).timeout; if camera: camera.offset = Vector2.ZERO 
+	var offset_x = 45 if not anim_sprite.flip_h else -45; var impact_pos_global = anim_sprite.global_position + Vector2(offset_x, 0)
+	
+	if sonido_black_flash: sonido_black_flash.play()
+	
+	_create_impact_particles(impact_pos_global)
+	spawn_black_flash_lightning(impact_pos_global)
+	
+	# --- ANIMACIÓN DEL TEXTO BLACK FLASH ---
+	if black_flash_rect: black_flash_rect.visible = true
+	if black_flash_label:
+		black_flash_label.visible = true
+		var text_tween = create_tween()
+		text_tween.set_loops(6) # Parpadear 6 veces rápido
+		text_tween.tween_property(black_flash_label, "modulate", Color(0.8, 0, 0), 0.04) # Rojo Sangre
+		text_tween.tween_property(black_flash_label, "modulate", Color.BLACK, 0.04) # Negro Puro
+		
+		text_tween.finished.connect(func(): black_flash_label.visible = false)
+	# ---------------------------------------
+
+	await get_tree().create_timer(0.02, true, false, true).timeout
+	apply_shake(25.0)
+	var previous_time_scale = Engine.time_scale
+	Engine.time_scale = 0.01
+	await get_tree().create_timer(HITSTOP_DURATION, true, false, true).timeout
+	Engine.time_scale = previous_time_scale
+	if black_flash_rect: black_flash_rect.visible = false
+	await get_tree().create_timer(0.2).timeout
+	if camera: camera.offset = Vector2.ZERO 
 
 func spawn_black_flash_lightning(impact_pos: Vector2) -> void:
 	for i in range(25): var lightning = Line2D.new(); lightning.width = randf_range(2.0, 12.0); lightning.gradient = lightning_gradient; var start_offset = Vector2(randf_range(-20, 20), randf_range(-20, 20)); var start_pos = impact_pos + start_offset; var angle = randf_range(0, TAU); var outward_vector = Vector2(randf_range(60, 150), 0).rotated(angle); var end_pos = start_pos + outward_vector; var mid_pos = start_pos.lerp(end_pos, randf_range(0.3, 0.7)) + Vector2(randf_range(-40, 40), randf_range(-40, 40)); lightning.add_point(start_pos); lightning.add_point(mid_pos); lightning.add_point(end_pos); lightning.z_index = 20; get_parent().add_child(lightning); var t = create_tween(); t.tween_property(lightning, "width", 0.0, 0.15).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN); t.tween_callback(Callable(lightning, "queue_free"))
@@ -312,7 +341,35 @@ func _play_afk(delta: float) -> void: if anim_sprite.animation != "afk": anim_sp
 func spawn_shadow() -> void: var s := Sprite2D.new(); s.texture = anim_sprite.sprite_frames.get_frame_texture(anim_sprite.animation, anim_sprite.frame); s.position = anim_sprite.global_position; s.scale = anim_sprite.scale * randf_range(0.95, 1.05); s.flip_h = anim_sprite.flip_h; s.modulate = Color(1, 1, 1, randf_range(0.3, 0.5)); get_parent().add_child(s); var t = create_tween(); t.tween_property(s, "modulate:a", 0.0, SHADOW_LIFETIME); t.tween_callback(Callable(s, "queue_free")); t.play()
 
 func _setup_impact_frame_nodes() -> void:
-	var canvas_layer = CanvasLayer.new(); canvas_layer.layer = 100; canvas_layer.name = "ImpactFrameCanvas"; add_child(canvas_layer); black_flash_rect = ColorRect.new(); black_flash_rect.color = Color.BLACK; black_flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT); black_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE; black_flash_rect.visible = false; canvas_layer.add_child(black_flash_rect)
+	# --- FONDO NEGRO (PANTALLA COMPLETA) ---
+	var canvas_layer = CanvasLayer.new(); canvas_layer.layer = 100; canvas_layer.name = "ImpactFrameCanvas"; add_child(canvas_layer); 
+	black_flash_rect = ColorRect.new(); 
+	black_flash_rect.color = Color.BLACK; 
+	black_flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT); 
+	black_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE; 
+	black_flash_rect.visible = false; 
+	canvas_layer.add_child(black_flash_rect)
+
+	# --- 🔥 TEXTO BLACK FLASH (PEQUEÑO Y CERCA DEL GATO) 🔥 ---
+	black_flash_label = Label.new()
+	black_flash_label.text = "BLACK FLASH"
+	black_flash_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	black_flash_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	
+	# TAMAÑO MÁS PEQUEÑO (Antes 80)
+	black_flash_label.add_theme_font_size_override("font_size", 36) 
+	black_flash_label.add_theme_color_override("font_outline_color", Color.WHITE)
+	black_flash_label.add_theme_constant_override("outline_size", 4)
+	
+	black_flash_label.visible = false
+	black_flash_label.z_index = 110 # Que se vea encima de todo
+	
+	# AHORA ES HIJO DEL GATO, SE MOVERÁ CON ÉL
+	add_child(black_flash_label)
+	
+	# POSICIÓN RELATIVA: Arriba de la cabeza. Ajusta el -100 si está muy arriba o abajo.
+	black_flash_label.position = Vector2(-100, -100) 
+	black_flash_label.size = Vector2(200, 50) # Un rectángulo ancho para centrar el texto
 
 func _setup_lightning_gradient() -> void:
 	lightning_gradient = Gradient.new(); lightning_gradient.set_color(0, Color(2.0, 0.1, 0.1, 1.0)); lightning_gradient.set_color(1, Color.BLACK)

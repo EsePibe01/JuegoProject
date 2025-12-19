@@ -1,6 +1,9 @@
 extends Area2D
 
-const NEXT_SCENE := "res://Bosquecito.tscn"
+# --- CAMBIO IMPORTANTE ---
+# En lugar de una constante fija, usamos una variable exportada.
+# Esto te permite elegir el mapa de destino desde el Inspector de Godot.
+@export_file("*.tscn") var next_scene_path: String = "" 
 
 @export var float_height: float = 10.0
 @export var float_speed: float = 2.0
@@ -13,7 +16,6 @@ var fading := false
 var interact_label: Label
 var audio_player: AudioStreamPlayer
 var particle_node: CPUParticles2D
-
 
 func _ready():
 	start_y = position.y
@@ -53,9 +55,11 @@ func _ready():
 	# -------------------------------
 	# SEÑALES
 	# -------------------------------
-	connect("body_entered", Callable(self, "_on_enter"))
-	connect("body_exited", Callable(self, "_on_exit"))
-
+	# Aseguramos que no estén conectadas previamente para evitar errores
+	if not is_connected("body_entered", Callable(self, "_on_enter")):
+		connect("body_entered", Callable(self, "_on_enter"))
+	if not is_connected("body_exited", Callable(self, "_on_exit")):
+		connect("body_exited", Callable(self, "_on_exit"))
 
 func _process(delta):
 	if fading:
@@ -67,8 +71,11 @@ func _process(delta):
 	if player_in_area and Input.is_action_just_pressed("interactuar"):
 		activate_portal()
 
-
 func activate_portal():
+	if next_scene_path == "":
+		print("⚠️ ERROR: No has seleccionado ninguna escena en el Inspector del Portal")
+		return
+
 	fading = true
 	interact_label.visible = false
 
@@ -77,14 +84,13 @@ func activate_portal():
 
 	await tween.finished
 
-	get_tree().change_scene_to_file(NEXT_SCENE)
-
+	# Cambiar a la escena seleccionada en la variable
+	get_tree().change_scene_to_file(next_scene_path)
 
 func _on_enter(body):
 	if body.is_in_group("player"):
 		player_in_area = true
 		interact_label.visible = true
-
 
 func _on_exit(body):
 	if body.is_in_group("player"):

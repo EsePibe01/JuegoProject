@@ -58,8 +58,6 @@ radius = 6.0
 
 [node name="PORTAL" type="Area2D"]
 script = ExtResource("1_bagdj")
-float_height = null
-float_speed = null
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(110, 95)

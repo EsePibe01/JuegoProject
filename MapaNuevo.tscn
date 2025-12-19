@@ -1,6 +1,7 @@
 [gd_scene load_steps=39 format=4 uid="uid://v4ewpadek5oe"]
 
 [ext_resource type="Texture2D" uid="uid://21vj6s6fb8fa" path="res://Montaña Glacial/Glacial-mountains-parallax-background_vnitti/Layers/sky.png" id="1_8gmw0"]
+[ext_resource type="Script" uid="uid://m47afqk5pjm" path="res://mapa_nuevo.gd" id="1_mo2cd"]
 [ext_resource type="Script" uid="uid://dgi2f4xb73l1v" path="res://audio_stream_player.gd" id="1_vpwrl"]
 [ext_resource type="Texture2D" uid="uid://c4v8f660yit6c" path="res://Cosas Test/SnowTiles.png" id="2_1bci8"]
 [ext_resource type="Texture2D" uid="uid://qsq26pw33ko7" path="res://Montaña Glacial/Glacial-mountains-parallax-background_vnitti/Layers/clouds_bg.png" id="2_fl5oj"]
@@ -21,7 +22,6 @@
 [ext_resource type="PackedScene" uid="uid://dhooci6s5d8vc" path="res://movilidad.tscn" id="17_cqjff"]
 [ext_resource type="PackedScene" uid="uid://dyxreo3dmn52r" path="res://zona_muerte.tscn" id="21_mo2cd"]
 [ext_resource type="PackedScene" uid="uid://c3onkvgr46ql" path="res://Portal.tscn" id="21_n7mki"]
-[ext_resource type="PackedScene" uid="uid://bhtvtab6it8vm" path="res://gatomafiajefe.tscn" id="22_mo2cd"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_a2w46"]
 texture = ExtResource("4_lerv6")
@@ -2036,6 +2036,7 @@ b = Vector2(-1, 593)
 size = Vector2(585.625, 576)
 
 [node name="Node2D" type="Node2D"]
+script = ExtResource("1_mo2cd")
 
 [node name="MusicaFondo" type="AudioStreamPlayer" parent="."]
 volume_db = -10.0
@@ -2142,11 +2143,8 @@ position = Vector2(4540, 530)
 [node name="PORTAL" parent="." instance=ExtResource("21_n7mki")]
 position = Vector2(12992, 112)
 scale = Vector2(2.7782075, 2.3058674)
+next_scene_path = "uid://c53koelcobip8"
 
 [node name="ZonaMuerte2" parent="." instance=ExtResource("21_mo2cd")]
 position = Vector2(-111.00001, 783)
 scale = Vector2(99.9438, 3.9685667)
-
-[node name="CharacterBody2D2" parent="." instance=ExtResource("22_mo2cd")]
-position = Vector2(702, 368)
-scale = Vector2(0.9970567, 0.9973911)

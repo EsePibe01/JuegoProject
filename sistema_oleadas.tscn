@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://1eikhsk33vb7"]
+
+[ext_resource type="Script" uid="uid://bn0xpvavh6emg" path="res://sistema_oleadas.gd" id="1_bx1no"]
+[ext_resource type="PackedScene" uid="uid://c8yra5uls4mkb" path="res://hongo.tscn" id="2_3py5d"]
+[ext_resource type="PackedScene" uid="uid://dnr65ytev7asm" path="res://pantalla_victoria.tscn" id="3_7oldb"]
+
+[node name="SistemaOleadas" type="Node2D" node_paths=PackedStringArray("puntos_de_spawn", "pantalla_victoria")]
+script = ExtResource("1_bx1no")
+hongo_scene = ExtResource("2_3py5d")
+puntos_de_spawn = [NodePath("Spawn1"), NodePath("Spawn2"), NodePath("Spawn3"), NodePath("Spawn4")]
+pantalla_victoria = NodePath("CapaVictoria/PantallaVictoria")
+
+[node name="Spawn1" type="Marker2D" parent="."]
+position = Vector2(230, 104)
+
+[node name="Spawn2" type="Marker2D" parent="."]
+position = Vector2(230, 104)
+
+[node name="Spawn3" type="Marker2D" parent="."]
+position = Vector2(230, 104)
+
+[node name="Spawn4" type="Marker2D" parent="."]
+position = Vector2(230, 104)
+
+[node name="CapaVictoria" type="CanvasLayer" parent="."]
+
+[node name="PantallaVictoria" parent="CapaVictoria" instance=ExtResource("3_7oldb")]

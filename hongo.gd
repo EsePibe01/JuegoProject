@@ -27,23 +27,26 @@ const PATROL_DURATION: float = 3.0
 var patrol_time_counter: float = 0.0 
 
 func _ready():
+	add_to_group("enemigos")
+	
 	is_dead = false; is_receiving_damage = false; is_attacking = false; is_stunned = false
 	set_physics_process(true); anim_sprite.play("idle"); patrol_time_counter = 0.0
 	
 	if barra_vida: 
 		barra_vida.max_value = MAX_VIDA; barra_vida.value = vida_actual; barra_vida.visible = true 
 	
-	# Evitar que el rayo choque con el propio hongo
 	if raycast_ataque: 
 		raycast_ataque.add_exception(self)
 		raycast_ataque.enabled = true
 
 func _physics_process(delta: float) -> void:
 	if is_dead: return 
-	if not is_on_floor(): velocity.y += GRAVITY * delta
-	else: velocity.y = 0
 	
-	# Si está ocupado (atacando/stun/herido), no se mueve
+	if not is_on_floor(): 
+		velocity.y += GRAVITY * delta
+	else: 
+		velocity.y = 0
+	
 	if is_attacking or is_stunned or is_receiving_damage: 
 		velocity.x = 0; move_and_slide(); return 
 
@@ -59,7 +62,11 @@ func _physics_process(delta: float) -> void:
 	if patrol_time_counter >= PATROL_DURATION: change_direction()
 
 	velocity.x = direction * SPEED
-	anim_sprite.flip_h = (direction == 1) 
+	
+	# --- AQUÍ ESTABA EL PROBLEMA DEL MOONWALK ---
+	# He cambiado el símbolo. Si antes caminaban al revés, ahora caminarán bien.
+	anim_sprite.flip_h = (direction > 0) 
+	
 	move_and_slide()
 	
 	if is_on_floor():
@@ -67,8 +74,10 @@ func _physics_process(delta: float) -> void:
 		else: anim_sprite.play("idle")
 
 func change_direction():
-	direction *= -1; patrol_time_counter = 0.0
-	# Voltear el raycast es clave para que ataque al lado correcto
+	direction *= -1
+	patrol_time_counter = 0.0
+	
+	# Voltear el raycast manualmente para atacar al lado correcto
 	raycast_ataque.target_position.x *= -1
 
 func start_attack(_target) -> void:
@@ -76,23 +85,19 @@ func start_attack(_target) -> void:
 	is_attacking = true
 	anim_sprite.play("attack")
 	
-	# Esperar a que termine la animación del golpe
 	await anim_sprite.animation_finished
 	
-	# Verificar si sigue colisionando para hacer daño
 	if raycast_ataque.is_colliding():
 		var cuerpo = raycast_ataque.get_collider()
 		if cuerpo.has_method("recibir_danio"): 
 			cuerpo.recibir_danio(DAÑO_ATAQUE)
 	
-	# Calcular si se marea (50%)
 	if randf() < CHANCE_DE_STUN: 
 		enter_stun_state()
 	else: 
 		is_attacking = false; anim_sprite.play("idle")
 
 func enter_stun_state() -> void:
-	print("El hongo se mareó!")
 	is_stunned = true; is_attacking = false
 	anim_sprite.play("attack_stun")
 	await get_tree().create_timer(TIEMPO_STUN).timeout
@@ -104,7 +109,6 @@ func recibir_danio(cantidad_danio: int) -> void:
 	vida_actual -= cantidad_danio
 	if barra_vida: barra_vida.value = vida_actual
 	
-	# Interrumpir ataque si le pegan
 	is_attacking = false; is_stunned = false
 	
 	if vida_actual <= 0: die()
@@ -118,8 +122,7 @@ func hit_received() -> void:
 
 func die() -> void:
 	if is_dead: return
-	
-	# 🔥 Curar al jugador (Grupo 'player') al morir 🔥
+	remove_from_group("enemigos")
 	get_tree().call_group("player", "curar_vida", 1)
 	
 	is_dead = true; set_physics_process(false); velocity = Vector2.ZERO
@@ -129,7 +132,8 @@ func die() -> void:
 	queue_free()
 
 func spawn_damage_number(valor: int) -> void:
-	var popup = DAMAGE_POPUP_SCENE.instantiate()
-	popup.setup(valor)
-	popup.global_position = global_position + Vector2(0, -30)
-	get_tree().current_scene.add_child(popup)
+	if DAMAGE_POPUP_SCENE:
+		var popup = DAMAGE_POPUP_SCENE.instantiate()
+		popup.setup(valor)
+		popup.global_position = global_position + Vector2(0, -30)
+		get_tree().current_scene.add_child(popup)

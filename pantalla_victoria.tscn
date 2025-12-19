@@ -1,0 +1,46 @@
+[gd_scene load_steps=5 format=3 uid="uid://dnr65ytev7asm"]
+
+[ext_resource type="Script" uid="uid://dbg8gol1rkwor" path="res://pantalla_victoria.gd" id="1_tyg4g"]
+[ext_resource type="VideoStream" uid="uid://du5gojpx6jf0d" path="res://videos/victoriasi (1).ogv" id="2_bjouw"]
+[ext_resource type="FontFile" uid="uid://b2ese7l7fqkdc" path="res://minecraft/Minecraft/Minecraft-Italic.otf" id="3_fa7vr"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_jinvv"]
+font_size = 41
+font_color = Color(1, 0.43137255, 0, 1)
+
+[node name="PantallaVictoria" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tyg4g")
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stream = ExtResource("2_bjouw")
+autoplay = true
+expand = true
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -166.0
+offset_top = -11.5
+offset_right = 166.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("3_fa7vr")
+text = "¡Muchas gracias por ver/probar esta demo!"
+label_settings = SubResource("LabelSettings_jinvv")

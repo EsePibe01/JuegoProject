@@ -15,6 +15,10 @@ run/main_scene="uid://dmkb7pt7n0uid"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+MusicaFondo="*res://audio_stream_player.gd"
+
 [display]
 
 window/stretch/mode="canvas_items"
